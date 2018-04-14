@@ -1,3 +1,18 @@
+ul,
+li,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  outline: none;
+}
+
+ul {
+  list-style: none;
+}
+
 .App {
   text-align: center;
 }
@@ -27,17 +42,41 @@
   to { transform: rotate(360deg); }
 }
 
-.search-container {
+.react-autosuggest__container {
   height: 100vh;
-  display: flex;
-  align-items: center;
 }
 
-.search-bar {
+.react-autosuggest__input {
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 242px);
   margin: 0 auto;
   border: 2px solid grey;
-  width: 50%;
+  width: 400px;
   height: 40px;
   padding: 0 40px;
   font-size: 18px;
+}
+
+.react-autosuggest__suggestions-container--open {
+  outline: 2px solid #e7e7e7;
+  position: relative;
+  top: calc(50% + 44px);
+  width: 480px;
+  margin: 0 auto;
+}
+
+.react-autosuggest__suggestions-list {
+  text-decoration: none;
+  text-align: left;
+}
+
+.react-autosuggest__suggestions-list li {
+  min-height: 40px;
+  line-height: 40px;
+  padding: 0 40px;
+}
+
+.react-autosuggest__suggestions-list li:hover {
+  background-color: #e7e7e7;
 }
