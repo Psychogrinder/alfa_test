@@ -64,6 +64,8 @@ ul {
   top: calc(50% + 44px);
   width: 480px;
   margin: 0 auto;
+  overflow: auto;
+  max-height: 200px;
 }
 
 .react-autosuggest__suggestions-list {

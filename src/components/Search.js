@@ -1,57 +1,86 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
+import IsolatedScroll from 'react-isolated-scroll';
 
-// Imagine you have a list of languages that you'd like to autosuggest.
-const languages = [
-  {
-    name: 'carrot',
-    year: 1972
-  },
-  {
-    name: 'apple',
-    year: 2012
-  },
-  {
-    name: 'pear',
-    year: 1972
-  },
-  {
-    name: 'cabbage',
-    year: 1972
-  },
-  {
-    name: 'orange',
-    year: 1972
-  },
-  {
-    name: 'melon',
-    year: 1972
+// Imagine you have a list of parts that you'd like to autosuggest.
+var parts;
+
+var token;
+
+fetch('http://shop.apgrup.ru/v1/login', {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
   }
-];
+}).then(function(response) {
+ return response.json();
+}).then(function(data) {
+  token = data.token;
+
+  fetch('http://shop.apgrup.ru/v1/partnames/existing', {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'shop-auth-token': token
+    }
+  }).then(function(catalogue) {
+    return catalogue.json();
+  }).then(function(data) {
+    console.log(data);
+    parts = data;
+  })
+});
 
 // Teach Autosuggest how to calculate suggestions for any given input value.
 const getSuggestions = value => {
   const inputValue = value.trim().toLowerCase();
   const inputLength = inputValue.length;
 
-  return inputLength === 0 ? [] : languages.filter(lang =>
-    lang.name.toLowerCase().slice(0, inputLength) === inputValue
+  return inputLength === 0 ? [] : parts.filter(lang =>
+    lang.title.toLowerCase().slice(0, inputLength) === inputValue
   );
 };
 
 // When suggestion is clicked, Autosuggest needs to populate the input
 // based on the clicked suggestion. Teach Autosuggest how to calculate the
 // input value for every given suggestion.
-const getSuggestionValue = suggestion => suggestion.name;
+const getSuggestionValue = suggestion => suggestion.title;
 
 // Use your imagination to render suggestions.
 const renderSuggestion = suggestion => (
   <div>
-    {suggestion.name}
+    {suggestion.title}
   </div>
 );
 
-class Example extends React.Component {
+function renderSectionTitle(section) {
+  return (
+    <strong>{section.title}</strong>
+  );
+}
+
+function getSectionSuggestions(section) {
+  return section.partNames;
+}
+
+function renderSuggestionsContainer({ containerProps, children }) {
+  const { ref, ...restContainerProps } = containerProps;
+  const callRef = isolatedScroll => {
+    if (isolatedScroll !== null) {
+      ref(isolatedScroll.component);
+    }
+  };
+
+  return (
+    <IsolatedScroll ref={callRef} {...restContainerProps}>
+      {children}
+    </IsolatedScroll>
+  );
+}
+
+class Search extends React.Component {
   constructor() {
     super();
 
@@ -67,6 +96,7 @@ class Example extends React.Component {
   }
 
   onChange = (event, { newValue }) => {
+    console.log(newValue);
     this.setState({
       value: newValue
     });
@@ -92,7 +122,7 @@ class Example extends React.Component {
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
-      placeholder: 'Type a programming language',
+      placeholder: 'Выбор узла',
       value,
       onChange: this.onChange
     };
@@ -106,9 +136,13 @@ class Example extends React.Component {
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={inputProps}
+        multiSection={true}
+        renderSectionTitle={renderSectionTitle}
+        getSectionSuggestions={getSectionSuggestions}
+        renderSuggestionsContainer={renderSuggestionsContainer}
       />
     );
   }
 }
 
-export default Example;
+export default Search;
